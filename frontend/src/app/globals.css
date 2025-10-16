@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Word Document Viewer Styles */
+.docx-wrapper {
+    background: white;
+    padding: 40px;
+    max-width: 210mm; /* A4 width */
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 297mm; /* A4 height */
+}
+
+    .docx-wrapper section.docx {
+        margin-bottom: 20px;
+        page-break-after: always;
+    }
+
+    /* Preserve Word formatting */
+    .docx-wrapper p {
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+    }
+
+    .docx-wrapper h1,
+    .docx-wrapper h2,
+    .docx-wrapper h3,
+    .docx-wrapper h4,
+    .docx-wrapper h5,
+    .docx-wrapper h6 {
+        margin: 10px 0;
+        font-weight: bold;
+    }
+
+    .docx-wrapper h1 {
+        font-size: 2em;
+    }
+
+    .docx-wrapper h2 {
+        font-size: 1.5em;
+    }
+
+    .docx-wrapper h3 {
+        font-size: 1.17em;
+    }
+
+/* Sanskrit/Devanagari font support */
+.docx-wrapper {
+    font-family: 'Noto Sans Devanagari', 'Sanskrit2003', 'Siddhanta', serif;
+}
+
+    /* Tables */
+    .docx-wrapper table {
+        border-collapse: collapse;
+        margin: 10px 0;
+    }
+
+        .docx-wrapper table td,
+        .docx-wrapper table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    /* Lists */
+    .docx-wrapper ul,
+    .docx-wrapper ol {
+        margin: 10px 0;
+        padding-left: 40px;
+    }
+
+/* Page breaks for printing */
+@media print {
+    .docx-wrapper section.docx {
+        page-break-after: always;
+    }
+}

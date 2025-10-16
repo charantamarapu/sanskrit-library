@@ -1,0 +1,79 @@
+'use client';
+
+import Link from 'next/link';
+
+export default function Home() {
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Simple Header */}
+            <header className="bg-gray-900 text-white shadow-md">
+                <div className="container mx-auto px-6 py-4">
+                    <h1 className="text-2xl font-bold">📚 Sanskrit Digital Library</h1>
+                </div>
+            </header>
+
+            <main className="container mx-auto px-6 py-12">
+                <div className="text-center max-w-3xl mx-auto mb-12">
+                    <div className="text-7xl mb-6">📚</div>
+                    <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        Sanskrit Digital Library
+                    </h2>
+                    <p className="text-xl text-gray-700 mb-8">
+                        Browse granthas, filter commentaries, download customized documents
+                    </p>
+
+                    <div className="flex gap-4 justify-center">
+                        <Link
+                            href="/granthas"
+                            className="bg-blue-600 text-white px-8 py-3 rounded font-bold hover:bg-blue-700 transition-colors"
+                        >
+                            Browse Library
+                        </Link>
+
+                        <Link
+                            href="/suggestions"
+                            className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded font-bold hover:bg-blue-50 transition-colors"
+                        >
+                            Suggest Corrections
+                        </Link>
+
+                        <a
+                            href="http://localhost:8000/admin/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-gray-900 text-white px-8 py-3 rounded font-bold hover:bg-black transition-colors"
+                        >
+                            Admin Panel
+                        </a>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div className="bg-white rounded p-6 shadow border border-gray-200">
+                        <div className="text-4xl mb-3">📖</div>
+                        <h3 className="text-lg font-bold mb-2 text-gray-900">Original Format</h3>
+                        <p className="text-gray-600 text-sm">
+                            Documents displayed without conversion
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded p-6 shadow border border-gray-200">
+                        <div className="text-4xl mb-3">🔍</div>
+                        <h3 className="text-lg font-bold mb-2 text-gray-900">Smart Filtering</h3>
+                        <p className="text-gray-600 text-sm">
+                            Select specific commentaries to include
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded p-6 shadow border border-gray-200">
+                        <div className="text-4xl mb-3">✍️</div>
+                        <h3 className="text-lg font-bold mb-2 text-gray-900">Community</h3>
+                        <p className="text-gray-600 text-sm">
+                            Contribute corrections and improvements
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+}
