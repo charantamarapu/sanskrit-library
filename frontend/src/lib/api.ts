@@ -1,45 +1,64 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8000/api';
+// Use relative URL - will use same protocol as frontend
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
-export const api = axios.create({
-    baseURL: API_BASE,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    timeout: 10000, // 10 second timeout
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 1800000, // 30 minutes
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Add response interceptor for debugging
 api.interceptors.response.use(
-    response => {
-        console.log('API Response:', response);
-        return response;
-    },
-    error => {
-        console.error('API Error:', error.response || error);
-        return Promise.reject(error);
-    }
+  (response) => {
+    console.log('API Response:', response);
+    return response;
+  },
+  (error) => {
+    console.error('API Error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
 );
 
-// Grantha APIs
+interface Grantha {
+  id: number;
+  title: string;
+  file: string;
+  commentaries: string[];
+  uploaded_at: string;
+}
+
+interface Suggestion {
+  id?: number;
+  grantha: number | string;
+  user_name: string;
+  user_email: string;
+  suggestion: string;
+  status?: string;
+}
+
 export const granthaAPI = {
-    list: () => api.get('/granthas/'),
-    get: (id: number) => api.get(`/granthas/${id}/`),
-    upload: (formData: FormData) => {
-        return api.post('/granthas/', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
-    },
-    delete: (id: number) => api.delete(`/granthas/${id}/`),
-    update: (id: number, data: any) => api.patch(`/granthas/${id}/`, data),
-    filter: (id: number, commentaries: string[]) =>
-        api.post(`/granthas/${id}/filter/`, { commentaries }, { responseType: 'blob' }),
-    download: (id: number) => api.get(`/granthas/${id}/download/`, { responseType: 'blob' }),
+  list: () => api.get<Grantha[]>('/granthas/'),
+  get: (id: number) => api.get<Grantha>(`/granthas/${id}/`),
+  filter: (id: number, commentaries: string[]) => 
+    api.post(`/granthas/${id}/filter/`, 
+      { commentaries }, 
+      { 
+        responseType: 'blob',
+        timeout: 1800000,
+      }
+    ),
+  download: (id: number) => 
+    api.get(`/granthas/${id}/download/`, 
+      { 
+        responseType: 'blob',
+        timeout: 1800000,
+      }
+    ),
 };
 
-// Suggestion APIs
 export const suggestionAPI = {
-    list: () => api.get('/suggestions/'),
-    create: (data: any) => api.post('/suggestions/', data),
+  create: (data: Suggestion) => api.post('/suggestions/', data),
 };

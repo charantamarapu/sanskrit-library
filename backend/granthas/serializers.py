@@ -2,33 +2,24 @@ from rest_framework import serializers
 from .models import Grantha, Suggestion
 
 class GranthaSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField()
+    
     class Meta:
         model = Grantha
-        fields = '__all__'
-        read_only_fields = ['uploaded_at', 'last_modified']
+        fields = ['id', 'title', 'file', 'commentaries', 'uploaded_at', 'last_modified']
+    
+    def get_file(self, obj):
+        # Return relative URL instead of absolute
+        if obj.file:
+            return obj.file.url  # This already gives relative path like /media/...
+        return None
 
 class GranthaUploadSerializer(serializers.ModelSerializer):
-    commentaries_input = serializers.CharField(write_only=True)
-    
     class Meta:
         model = Grantha
-        fields = ['title', 'file', 'commentaries_input']
-    
-    def create(self, validated_data):
-        # Parse comma-separated commentaries
-        commentaries_str = validated_data.pop('commentaries_input', '')
-        commentaries = [c.strip() for c in commentaries_str.split(',') if c.strip()]
-        
-        grantha = Grantha.objects.create(
-            commentaries=commentaries,
-            **validated_data
-        )
-        return grantha
+        fields = ['id', 'title', 'file', 'commentaries']
 
 class SuggestionSerializer(serializers.ModelSerializer):
-    grantha_title = serializers.CharField(source='grantha.title', read_only=True)
-    
     class Meta:
         model = Suggestion
-        fields = '__all__'
-        read_only_fields = ['submitted_at']
+        fields = ['id', 'grantha', 'user_name', 'user_email', 'suggestion', 'status', 'submitted_at']

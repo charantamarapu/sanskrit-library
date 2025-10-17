@@ -1,112 +1,134 @@
-﻿from docx import Document
+from docx import Document
 from io import BytesIO
+import time
+from copy import deepcopy
+
+
+def get_paragraph_heading_level(paragraph):
+    """
+    Get heading level ONLY from Word's built-in Heading styles.
+    Returns 1-9 if heading, None if body text.
+    """
+    style_name = paragraph.style.name
+    
+    if style_name.startswith('Heading'):
+        try:
+            level_str = style_name.replace('Heading', '').strip()
+            if level_str.isdigit():
+                level = int(level_str)
+                if 1 <= level <= 9:
+                    return level
+            elif level_str == '':
+                return 1
+        except:
+            pass
+    
+    return None
+
 
 def filter_docx_by_commentaries(docx_path, selected_commentaries):
-    """
-    Filter document by commentary names.
+    """Filter Word document by selected commentaries."""
     
-    Logic:
-    - If heading matches commentary name AND selected → INCLUDE
-    - If heading matches commentary name AND NOT selected → REMOVE
-    - If heading doesn't match any commentary → INCLUDE (structural)
-    - If NO commentaries selected at all → REMOVE ALL commentaries
-    """
+    start_time = time.time()
+    print(f"\n{'='*70}")
+    print("FILTERING STARTED")
+    print(f"{'='*70}\n")
     
-    doc = Document(docx_path)
+    try:
+        doc = Document(docx_path)
+    except Exception as e:
+        print(f"ERROR loading document: {e}")
+        raise
+    
+    # Create new document with copied styles
     new_doc = Document()
-    new_doc.styles._element = doc.styles._element
+    new_doc.styles._element = deepcopy(doc.styles._element)
+    
+    # Remove default empty paragraph
+    if len(new_doc.paragraphs) > 0:
+        p = new_doc.paragraphs[0]._element
+        p.getparent().remove(p)
     
     all_commentaries = selected_commentaries.get('all_commentaries', [])
     selected = selected_commentaries.get('selected', [])
     
-    # Check if 'all' is selected
     include_all = 'all' in selected
-    
-    # Check if NOTHING is selected (empty list or only empty strings)
-    nothing_selected = len(selected) == 0 or all(not s or s.strip() == '' for s in selected)
+    nothing_selected = len(selected) == 0
     
     skip_until_level = None
+    included = 0
+    excluded = 0
+    commentary_actions = {}
     
-    print(f"\n{'='*70}")
-    print(f"ALL COMMENTARIES: {all_commentaries}")
-    print(f"SELECTED: {selected}")
-    print(f"Include all: {include_all}")
-    print(f"Nothing selected: {nothing_selected}")
-    print(f"{'='*70}\n")
+    print(f"Commentaries: {all_commentaries}")
+    print(f"Selected: {selected}")
+    print(f"Mode: {'ALL' if include_all else 'NONE' if nothing_selected else 'SELECTIVE'}\n")
     
-    for paragraph in doc.paragraphs:
-        style_name = paragraph.style.name
+    for i, paragraph in enumerate(doc.paragraphs):
+        if i > 0 and i % 1000 == 0:
+            print(f"Processing: {i}/{len(doc.paragraphs)} paragraphs...")
+        
         text = paragraph.text.strip()
         
         if not text:
             if skip_until_level is None:
-                new_para = new_doc.add_paragraph()
-                new_para.style = paragraph.style
+                new_para_element = deepcopy(paragraph._element)
+                new_doc._element.body.append(new_para_element)
+                included += 1
+            else:
+                excluded += 1
             continue
         
-        if style_name.startswith('Heading'):
-            level = int(style_name.replace('Heading', '').strip() or '1')
-            
-            # Stop skipping if reached same or higher level
+        heading_level = get_paragraph_heading_level(paragraph)
+        
+        if heading_level is not None:
             if skip_until_level is not None:
-                if level <= skip_until_level:
+                if heading_level <= skip_until_level:
                     skip_until_level = None
                 else:
-                    print(f"  [SKIP] {style_name}: '{text}'")
+                    excluded += 1
                     continue
             
-            # Check if this heading is a commentary
             if text in all_commentaries:
-                # This IS a commentary heading
+                if text not in commentary_actions:
+                    if include_all:
+                        print(f"✓ Level {heading_level}: '{text}' → INCLUDE (All)")
+                        commentary_actions[text] = 'include'
+                    elif nothing_selected:
+                        print(f"✗ Level {heading_level}: '{text}' → REMOVE (None)")
+                        commentary_actions[text] = 'remove'
+                    elif text in selected:
+                        print(f"✓ Level {heading_level}: '{text}' → INCLUDE (Selected)")
+                        commentary_actions[text] = 'include'
+                    else:
+                        print(f"✗ Level {heading_level}: '{text}' → REMOVE (Not selected)")
+                        commentary_actions[text] = 'remove'
                 
-                if include_all:
-                    # All selected - include everything
-                    print(f"✓ {style_name}: '{text}' (All selected)")
+                if include_all or (text in selected):
                     skip_until_level = None
-                    
-                elif nothing_selected:
-                    # Nothing selected - REMOVE ALL commentaries
-                    print(f"✗ {style_name}: '{text}' (No selection - REMOVE ALL commentaries)")
-                    skip_until_level = level
+                elif nothing_selected or (text not in selected):
+                    skip_until_level = heading_level
+                    excluded += 1
                     continue
-                    
-                elif text in selected:
-                    # This specific commentary is selected
-                    print(f"✓ {style_name}: '{text}' (SELECTED)")
-                    skip_until_level = None
-                    
-                else:
-                    # This commentary is NOT selected
-                    print(f"✗ {style_name}: '{text}' (NOT selected - REMOVE)")
-                    skip_until_level = level
-                    continue
-            else:
-                # NOT a commentary - structural heading - ALWAYS INCLUDE
-                print(f"→ {style_name}: '{text}' (Structural)")
-                skip_until_level = None
         
         if skip_until_level is not None:
+            excluded += 1
             continue
         
-        # Add paragraph
-        new_para = new_doc.add_paragraph()
-        new_para.style = paragraph.style
-        
-        for run in paragraph.runs:
-            new_run = new_para.add_run(run.text)
-            new_run.bold = run.bold
-            new_run.italic = run.italic
-            new_run.underline = run.underline
-            if run.font.size:
-                new_run.font.size = run.font.size
-            if run.font.name:
-                new_run.font.name = run.font.name
+        new_para_element = deepcopy(paragraph._element)
+        new_doc._element.body.append(new_para_element)
+        included += 1
+    
+    elapsed = time.time() - start_time
     
     print(f"\n{'='*70}")
-    print("FILTERING COMPLETE")
+    print(f"COMPLETED:")
+    print(f"  Total: {len(doc.paragraphs)}, Included: {included}, Excluded: {excluded}")
+    print(f"  Time: {elapsed:.2f}s")
     print(f"{'='*70}\n")
     
     buffer = BytesIO()
     new_doc.save(buffer)
     buffer.seek(0)
+    
     return buffer
