@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['129.159.226.121', 'sanskrit-digital-library.mooo.com']
+ALLOWED_HOSTS = ['68.233.103.3', 'sanskrit-digital-library.mooo.com', 'localhost', '127.0.0.1',]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,7 +60,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sanskrit_library',
         'USER': 'sanskrit_user',
-        'PASSWORD': 'Sanskrit@2025',
+        'PASSWORD': 'Govinda@1008',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -93,7 +93,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     'https://sanskrit-digital-library.mooo.com',
     'http://sanskrit-digital-library.mooo.com',
-    'http://129.159.226.121',
+    'http://68.233.103.3',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
