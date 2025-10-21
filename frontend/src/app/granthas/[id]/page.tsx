@@ -201,7 +201,7 @@ return (
               className="w-full bg-gray-900 text-white py-3 rounded hover:bg-black font-bold"
               disabled={downloading}
             >
-              ✍️ Suggest
+              ✍️ Suggest Edit
             </button>
           </div>
         </aside>

@@ -30,13 +30,6 @@ export default function Home() {
                             Browse Library
                         </Link>
 
-                        <Link
-                            href="/suggestions"
-                            className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded font-bold hover:bg-blue-50 transition-colors"
-                        >
-                            Suggest Corrections
-                        </Link>
-
                         <a
                             href="/admin/"
                             target="_blank"
