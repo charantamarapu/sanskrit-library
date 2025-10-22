@@ -10,6 +10,7 @@ interface Grantha {
   title: string;
   file: string;
   commentaries: string[];
+  tags?: string[]
   uploaded_at: string;
 }
 

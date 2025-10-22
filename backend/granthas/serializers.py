@@ -6,7 +6,7 @@ class GranthaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Grantha
-        fields = ['id', 'title', 'file', 'commentaries', 'uploaded_at', 'last_modified']
+        fields = ['id', 'title', 'file', 'commentaries', 'tags', 'uploaded_at', 'last_modified']
     
     def get_file(self, obj):
         # Return relative URL instead of absolute
@@ -17,7 +17,7 @@ class GranthaSerializer(serializers.ModelSerializer):
 class GranthaUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grantha
-        fields = ['id', 'title', 'file', 'commentaries']
+        fields = ['id', 'title', 'file', 'commentaries', 'tags']
 
 class SuggestionSerializer(serializers.ModelSerializer):
     class Meta:

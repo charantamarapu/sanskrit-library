@@ -9,6 +9,7 @@ interface Grantha {
   title: string;
   file: string;
   commentaries: string[];
+  tags?: string[]
   uploaded_at: string;
 }
 
@@ -35,10 +36,25 @@ export default function GranthasPage() {
     }
   };
 
-  const filteredGranthas = granthas.filter((g) =>
-    g.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  const filteredGranthas = granthas.filter((grantha) => {
+    const searchLower = searchTerm.toLowerCase();
+  
+    // Search in title
+    const titleMatch = grantha.title.toLowerCase().includes(searchLower);
+  
+    // Search in tags
+    const tagsMatch = grantha.tags && grantha.tags.some(tag => 
+      tag.toLowerCase().includes(searchLower)
+    );
+  
+    // Search in commentaries
+    const commentariesMatch = grantha.commentaries && grantha.commentaries.some(commentary => 
+      commentary.toLowerCase().includes(searchLower)
+    );
+  
+    return titleMatch || tagsMatch || commentariesMatch;
+  });
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
