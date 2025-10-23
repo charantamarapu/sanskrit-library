@@ -1,7 +1,23 @@
 ﻿from django.contrib import admin
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 from django import forms
 from .models import Grantha, Suggestion
 import os
+
+# Unregister default User admin
+admin.site.unregister(User)
+
+# Custom User Admin
+class SafeUserAdmin(UserAdmin):
+    def has_delete_permission(self, request, obj=None):
+        # Prevent self-deletion
+        if obj is not None and obj == request.user:
+            return False
+        return super().has_delete_permission(request, obj)
+
+# Re-register with custom admin
+admin.site.register(User, SafeUserAdmin)
 
 class GranthaAdminForm(forms.ModelForm):
     commentaries_input = forms.CharField(
