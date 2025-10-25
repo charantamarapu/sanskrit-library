@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from django.http import FileResponse, HttpResponse
 from .models import Grantha, Suggestion
 from .serializers import GranthaSerializer, GranthaUploadSerializer, SuggestionSerializer
@@ -88,6 +89,7 @@ class GranthaViewSet(viewsets.ModelViewSet):
 class SuggestionViewSet(viewsets.ModelViewSet):
     queryset = Suggestion.objects.all().order_by('-submitted_at')
     serializer_class = SuggestionSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = super().get_queryset()

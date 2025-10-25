@@ -22,4 +22,4 @@ class GranthaUploadSerializer(serializers.ModelSerializer):
 class SuggestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suggestion
-        fields = ['id', 'grantha', 'user_name', 'user_email', 'suggestion', 'status', 'submitted_at']
+        fields = ['id', 'grantha', 'user_name', 'user_email', 'user_mobile', 'suggestion', 'status', 'submitted_at']

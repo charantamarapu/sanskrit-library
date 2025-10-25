@@ -121,19 +121,19 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# REST Framework Settings
+# REST Framework settings
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ],
 }
+
+# Add this to exempt API routes from CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://sanskrit-digital-library.mooo.com',
+    'http://localhost:3000',
+]
 
 # HTTPS Security Settings
 SECURE_SSL_REDIRECT = True
