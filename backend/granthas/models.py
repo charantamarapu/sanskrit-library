@@ -17,12 +17,24 @@ class Grantha(models.Model):
         indexes = [
             models.Index(fields=['title']),
         ]
+
     def save(self, *args, **kwargs):
         # Auto-fill title from filename if title is empty
         if not self.title and self.file:
             filename = os.path.basename(self.file.name)
-            # Remove extension and clean up
             self.title = os.path.splitext(filename)[0]
+    
+        # Delete old file if new file is being uploaded
+        if self.pk:
+            try:
+                old_file = Grantha.objects.get(pk=self.pk).file
+            except Grantha.DoesNotExist:
+                old_file = None
+            new_file = self.file
+            # Only delete if new file is uploaded and old file exists and paths are not same
+            if old_file and old_file != new_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+    
         super().save(*args, **kwargs)
 
     def __str__(self):
